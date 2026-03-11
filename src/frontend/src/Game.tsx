@@ -61,8 +61,9 @@ export default function Game() {
 
     if (absDx > threshold || absDy > threshold) {
       if (absDx > absDy) {
-        if (dx < 0) setPlayerLane(useGameStore.getState().playerLane - 1);
-        else setPlayerLane(useGameStore.getState().playerLane + 1);
+        // Swipe right -> move right (lane + 1), swipe left -> move left (lane - 1)
+        if (dx > 0) setPlayerLane(useGameStore.getState().playerLane + 1);
+        else setPlayerLane(useGameStore.getState().playerLane - 1);
       } else {
         if (dy < 0) jump();
         else slide();

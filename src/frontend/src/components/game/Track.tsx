@@ -19,10 +19,12 @@ const BUILDING_COLORS = [
 function TrackTile({ position }: { position: [number, number, number] }) {
   return (
     <group position={position}>
+      {/* Road surface */}
       <mesh position={[0, -0.05, 0]} receiveShadow>
         <boxGeometry args={[TRACK_WIDTH, 0.1, TILE_LENGTH]} />
         <meshStandardMaterial color="#2b2d42" />
       </mesh>
+      {/* Lane lines */}
       <mesh position={[-1, 0, 0]}>
         <boxGeometry args={[0.06, 0.02, TILE_LENGTH]} />
         <meshStandardMaterial color="#ffffff" opacity={0.4} transparent />
@@ -31,18 +33,22 @@ function TrackTile({ position }: { position: [number, number, number] }) {
         <boxGeometry args={[0.06, 0.02, TILE_LENGTH]} />
         <meshStandardMaterial color="#ffffff" opacity={0.4} transparent />
       </mesh>
+      {/* Curb left */}
       <mesh position={[-3.1, 0.05, 0]}>
-        <boxGeometry args={[0.2, 0.1, TILE_LENGTH]} />
+        <boxGeometry args={[0.2, 0.12, TILE_LENGTH]} />
         <meshStandardMaterial color="#8d99ae" />
       </mesh>
+      {/* Curb right */}
       <mesh position={[3.1, 0.05, 0]}>
-        <boxGeometry args={[0.2, 0.1, TILE_LENGTH]} />
+        <boxGeometry args={[0.2, 0.12, TILE_LENGTH]} />
         <meshStandardMaterial color="#8d99ae" />
       </mesh>
+      {/* Pavement left */}
       <mesh position={[-4.5, -0.02, 0]}>
         <boxGeometry args={[2.8, 0.08, TILE_LENGTH]} />
         <meshStandardMaterial color="#adb5bd" />
       </mesh>
+      {/* Pavement right */}
       <mesh position={[4.5, -0.02, 0]}>
         <boxGeometry args={[2.8, 0.08, TILE_LENGTH]} />
         <meshStandardMaterial color="#adb5bd" />
@@ -85,7 +91,6 @@ function generateBuildings(seed: number): BuildingData[] {
   return buildings;
 }
 
-// Stable tile keys
 const TILE_KEYS = Array.from({ length: NUM_TILES }, (_, i) => `tile-${i}`);
 
 interface TileGroupProps {
@@ -121,13 +126,14 @@ export default function Track() {
     for (let i = 0; i < NUM_TILES; i++) tileSeeds.current[i] = i;
   }, []);
 
-  useFrame(() => {
+  // Use delta time (same as Obstacles) so track and obstacles move in perfect sync
+  useFrame((_, delta) => {
     const { speed, gameState } = useGameStore.getState();
     if (gameState !== "playing") return;
     for (let i = 0; i < tilesRef.current.length; i++) {
       const tile = tilesRef.current[i];
       if (!tile) continue;
-      tile.position.z += speed * (1 / 60);
+      tile.position.z += speed * delta;
       if (tile.position.z > TILE_LENGTH * 1.5) {
         tile.position.z -= TILE_LENGTH * NUM_TILES;
         tileSeeds.current[i] = tileSeeds.current[i] + NUM_TILES;
